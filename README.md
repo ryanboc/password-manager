@@ -68,8 +68,8 @@
 
 ### 1) Clone the repository
 ```bash
-git clone git@github.com:ryanboc/<YOUR-REPO>.git
-cd <YOUR-PROJECT-FOLDER>
+git clone git@github.com:ryanboc/password-manager.git password-manager
+cd password-manager
 ```
 
 ### 2) Install dependencies

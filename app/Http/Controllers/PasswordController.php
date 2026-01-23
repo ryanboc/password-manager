@@ -95,4 +95,17 @@ class PasswordController extends Controller
 
         return redirect()->route('passwords.index')->with('success', 'Password deleted successfully.');
     }
+
+    public function reveal(Request $request, $id)
+    {
+        // Find the password entry belonging to the logged-in user
+        $passwordEntry = Password::where('id', $id)
+                            ->where('user_id', auth()->id())
+                            ->firstOrFail();
+
+        // Return the plain text password as JSON
+        return response()->json([
+            'password' => $passwordEntry->password
+        ]);
+    }
 }

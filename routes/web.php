@@ -46,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
         auth()->user()->disableTwoFactorAuthentication();
         return back()->with('success', '2FA Disabled!');
     });
+
+    Route::get('/passwords/{id}/reveal', [App\Http\Controllers\PasswordController::class, 'reveal'])->name('passwords.reveal');
 });
 
 

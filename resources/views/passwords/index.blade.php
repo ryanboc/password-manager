@@ -12,7 +12,9 @@
             <tr>
                 <th>Site Name</th>
                 <th>Username</th>
-                <th style="width: 200px;">Password</th> <th style="width: 150px;">Actions</th>
+                <th style="width: 200px;">Password</th>
+                <th style="width: 100px;">Copy</th> 
+                <th style="width: 150px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,14 +24,18 @@
                 <td>{{ $password->username }}</td>
                 <td>
                     <span class="password-mask fw-bold">••••••••</span>
-                    
                     <button class="btn btn-outline-secondary btn-sm ms-2 reveal-btn" 
                             onclick="togglePassword(this, {{ $password->id }})">
                         Show
                     </button>
                 </td>
                 <td>
-                    <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-primary w-100" onclick="copyPassword(this, {{ $password->id }})">
+                        Copy
+                    </button>
+                </td>
+                <td>
+                    <div class="btn-group w-100" role="group">
                         <a href="{{ route('passwords.edit', $password->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         <form action="{{ route('passwords.destroy', $password->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
                             @csrf @method('DELETE')
@@ -55,9 +61,9 @@
             "order": [[ 0, "asc" ]], // Default sort by Site Name (Column 0)
             "pageLength": 10,        // Show 10 rows per page
             "columnDefs": [
-                // Disable Sorting and Searching on Password (col 2) and Actions (col 3)
-                { "orderable": false, "targets": [2, 3] },
-                { "searchable": false, "targets": [2, 3] }
+                // Disable Sorting and Searching on Password (col 2), Copy (col 3), and Actions (col 4)
+                { "orderable": false, "targets": [2, 3, 4] },
+                { "searchable": false, "targets": [2, 3, 4] }
             ],
             "language": {
                 "search": "Filter Records:" // Custom label
@@ -95,5 +101,50 @@
                 btn.innerText = "Err";
             });
     }
+
+    function copyPassword(btn, id) {
+
+        const originalText = btn.innerHTML;
+        
+        // 1. Visual feedback that it's working
+        btn.innerText = "...";
+
+        // 2. Fetch the actual password from your server
+        fetch(`/passwords/${id}/reveal`)
+            .then(res => res.json())
+            .then(data => {
+                // 3. Use the Clipboard API to save the password
+                navigator.clipboard.writeText(data.password).then(() => {
+                    // 4. Success feedback
+                    btn.innerText = "Copied!";
+                    btn.classList.replace('btn-outline-primary', 'btn-success');
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('btn-success', 'btn-outline-primary');
+                    }, 2000);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                btn.innerText = "Error";
+                btn.classList.replace('btn-outline-primary', 'btn-danger');
+            });
+    }
+
+    function performCopy(text, btn, originalText) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerText = "Copied!";
+            btn.classList.replace('btn-outline-primary', 'btn-success');
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.replace('btn-success', 'btn-outline-primary');
+            }, 2000);
+        });
+    }
+
 </script>
 @endsection
